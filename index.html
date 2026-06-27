@@ -292,6 +292,82 @@
     color: #fff;
     border-color: var(--accent);
   }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+  .breadcrumb button {
+    border: none;
+    background: none;
+    padding: 2px 4px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .breadcrumb button:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-soft); }
+  .breadcrumb .current { color: var(--text); font-weight: 600; }
+  .progress-track {
+    background: var(--border);
+    border-radius: 6px;
+    height: 7px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .progress-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 6px;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag {
+    display: inline-block;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 9px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .phase-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: var(--bg-card);
+  }
+  .phase-left { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+  .phase-status-icon { font-size: 16px; line-height: 1.4; flex-shrink: 0; }
+  .phase-name { font-weight: 600; font-size: 15px; }
+  .phase-deadline { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .status-select-inline {
+    width: auto;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+  .back-btn { margin-bottom: 14px; }
+  .detail-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .detail-panel .card-meta { margin-bottom: 10px; }
   @media (max-width: 900px) {
     .card-grid { grid-template-columns: 1fr; }
   }
@@ -326,6 +402,7 @@
       <button data-tab="prompts"><span class="icon">💬</span> Prompts</button>
       <button data-tab="content"><span class="icon">📚</span> Content Tracker</button>
       <button data-tab="inbox"><span class="icon">📥</span> Quick Capture</button>
+      <button data-tab="projects"><span class="icon">📁</span> Projekti</button>
     </nav>
   </aside>
   <div class="main-col">
@@ -476,6 +553,102 @@
     <div id="list-inbox" class="card-grid"></div>
   </section>
 
+  <!-- PROJEKTI SECTION -->
+  <section class="section" id="section-projects">
+    <div id="proj-breadcrumb" class="breadcrumb"></div>
+    <div id="proj-toolbar" class="toolbar"></div>
+
+    <div class="form-panel" id="form-project">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Name</label>
+          <input type="text" id="project-name">
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="project-type">
+            <option value="YT Kanal">YT Kanal</option>
+            <option value="Digitalni Proizvod">Digitalni Proizvod</option>
+            <option value="PWA App">PWA App</option>
+            <option value="Drugo">Drugo</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="project-status">
+            <option value="Aktivan">Aktivan</option>
+            <option value="Pauziran">Pauziran</option>
+            <option value="Završen">Završen</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deadline (optional)</label>
+          <input type="date" id="project-deadline">
+        </div>
+        <div class="field">
+          <label>Tools used (comma separated)</label>
+          <input type="text" id="project-tools" placeholder="e.g. Claude, Premiere, Canva">
+        </div>
+        <div class="field full">
+          <label>Linked .md files (one reference per line)</label>
+          <textarea id="project-mdfiles" rows="3" placeholder="e.g. notes/plan.md"></textarea>
+        </div>
+        <div class="field full">
+          <label>General notes / workflow</label>
+          <textarea id="project-notes" class="large" rows="6"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-project">Cancel</button>
+        <button class="primary" id="saveBtn-project">Save</button>
+      </div>
+    </div>
+
+    <div class="form-panel" id="form-subproject">
+      <div class="form-grid single">
+        <div class="field full">
+          <label>Name</label>
+          <input type="text" id="subproject-name" placeholder="e.g. The Old Vicarage">
+        </div>
+        <div class="field full">
+          <label>Notes</label>
+          <textarea id="subproject-notes" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-subproject">Cancel</button>
+        <button class="primary" id="saveBtn-subproject">Save</button>
+      </div>
+    </div>
+
+    <div class="form-panel" id="form-phase">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Phase name</label>
+          <input type="text" id="phase-name" placeholder="e.g. Scripting">
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="phase-status">
+            <option value="todo">☐ to do</option>
+            <option value="progress">⏳ in progress</option>
+            <option value="done">✓ done</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deadline (optional)</label>
+          <input type="date" id="phase-deadline">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-phase">Cancel</button>
+        <button class="primary" id="saveBtn-phase">Save</button>
+      </div>
+    </div>
+
+    <div id="projects-content"></div>
+  </section>
+
     </main>
   </div>
 </div>
@@ -487,6 +660,7 @@
     prompts: 'akb_prompts',
     content: 'akb_content',
     inbox: 'akb_inbox',
+    projects: 'akb_projects',
     theme: 'akb_theme'
   };
 
@@ -514,10 +688,16 @@
     tools: load(STORE_KEYS.tools),
     prompts: load(STORE_KEYS.prompts),
     content: load(STORE_KEYS.content),
-    inbox: load(STORE_KEYS.inbox)
+    inbox: load(STORE_KEYS.inbox),
+    projects: load(STORE_KEYS.projects)
   };
 
   let editing = { tools: null, prompts: null, content: null };
+  let editingProject = null;
+  let editingSubproject = null;
+  let editingPhase = null;
+  let projNav = { level: 'list', projectId: null, subprojectId: null };
+  let projSearchQuery = '';
 
   // ---------- THEME ----------
   const themeBtn = document.getElementById('themeBtn');
@@ -873,11 +1053,341 @@
   }
   document.getElementById('search-inbox').addEventListener('input', renderInbox);
 
+  // ================= PROJEKTI =================
+  const PHASE_ICON = { done: '✓', progress: '⏳', todo: '☐' };
+  const PHASE_LABEL = { done: 'Done', progress: 'In progress', todo: 'To do' };
+
+  function findProject(id) { return state.projects.find(p => p.id === id); }
+  function findSubproject(project, id) { return project ? project.subprojects.find(s => s.id === id) : null; }
+
+  function projectProgress(project) {
+    const total = project.subprojects.length;
+    const done = project.subprojects.filter(s => s.phases.length > 0 && s.phases.every(ph => ph.status === 'done')).length;
+    return { done, total };
+  }
+  function subprojectProgress(sub) {
+    const total = sub.phases.length;
+    const done = sub.phases.filter(ph => ph.status === 'done').length;
+    return { done, total };
+  }
+  function progressBarHtml(done, total) {
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    return `
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-label">${done}/${total} done</div>
+    `;
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    try { return new Date(d).toLocaleDateString(); } catch (e) { return d; }
+  }
+  function touchProject(project) { project.lastModified = Date.now(); }
+
+  function renderBreadcrumb() {
+    const el = document.getElementById('proj-breadcrumb');
+    const parts = [`<button data-bc="list">Projekti</button>`];
+    if (projNav.level === 'project' || projNav.level === 'subproject') {
+      const project = findProject(projNav.projectId);
+      parts.push(`<span class="sep">›</span>`);
+      if (projNav.level === 'subproject') {
+        parts.push(`<button data-bc="project">${escapeHtml(project ? project.name : '')}</button>`);
+      } else {
+        parts.push(`<span class="current">${escapeHtml(project ? project.name : '')}</span>`);
+      }
+    }
+    if (projNav.level === 'subproject') {
+      const project = findProject(projNav.projectId);
+      const sub = findSubproject(project, projNav.subprojectId);
+      parts.push(`<span class="sep">›</span>`);
+      parts.push(`<span class="current">${escapeHtml(sub ? sub.name : '')}</span>`);
+    }
+    el.innerHTML = parts.join(' ');
+    el.querySelectorAll('[data-bc]').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.bc === 'list') { projNav = { level: 'list', projectId: null, subprojectId: null }; }
+      else if (b.dataset.bc === 'project') { projNav.level = 'project'; projNav.subprojectId = null; }
+      renderProjectsSection();
+    }));
+  }
+
+  function renderProjectsSection() {
+    renderBreadcrumb();
+    const toolbar = document.getElementById('proj-toolbar');
+    const content = document.getElementById('projects-content');
+    closeForm2('project'); closeForm2('subproject'); closeForm2('phase');
+
+    if (projNav.level === 'list') {
+      toolbar.innerHTML = `
+        <input type="text" class="search" id="search-projects" placeholder="Search projects…">
+        <button class="primary" id="addBtn-project">+ Add Project</button>
+      `;
+      document.getElementById('search-projects').value = projSearchQuery;
+      document.getElementById('search-projects').addEventListener('input', e => {
+        projSearchQuery = e.target.value.toLowerCase();
+        renderProjectsList(content);
+      });
+      document.getElementById('addBtn-project').addEventListener('click', () => openProjectForm(null));
+      renderProjectsList(content);
+    } else if (projNav.level === 'project') {
+      const project = findProject(projNav.projectId);
+      toolbar.innerHTML = `
+        <button id="proj-back-to-list">← Back</button>
+        <button id="proj-edit-project">Edit Project</button>
+        <button id="proj-delete-project">Delete Project</button>
+        <button class="primary" id="addBtn-subproject">+ Add Sub-project</button>
+      `;
+      document.getElementById('proj-back-to-list').addEventListener('click', () => {
+        projNav = { level: 'list', projectId: null, subprojectId: null };
+        renderProjectsSection();
+      });
+      document.getElementById('proj-edit-project').addEventListener('click', () => openProjectForm(project));
+      document.getElementById('proj-delete-project').addEventListener('click', () => {
+        if (confirm('Delete this project and all its sub-projects?')) {
+          state.projects = state.projects.filter(p => p.id !== project.id);
+          save(STORE_KEYS.projects, state.projects);
+          projNav = { level: 'list', projectId: null, subprojectId: null };
+          renderProjectsSection();
+        }
+      });
+      document.getElementById('addBtn-subproject').addEventListener('click', () => openSubprojectForm(null));
+      renderProjectDetail(content, project);
+    } else if (projNav.level === 'subproject') {
+      const project = findProject(projNav.projectId);
+      const sub = findSubproject(project, projNav.subprojectId);
+      toolbar.innerHTML = `
+        <button id="proj-back-to-project">← Back</button>
+        <button id="proj-edit-subproject">Edit Sub-project</button>
+        <button id="proj-delete-subproject">Delete Sub-project</button>
+        <button class="primary" id="addBtn-phase">+ Add Phase</button>
+      `;
+      document.getElementById('proj-back-to-project').addEventListener('click', () => {
+        projNav.level = 'project'; projNav.subprojectId = null;
+        renderProjectsSection();
+      });
+      document.getElementById('proj-edit-subproject').addEventListener('click', () => openSubprojectForm(sub));
+      document.getElementById('proj-delete-subproject').addEventListener('click', () => {
+        if (confirm('Delete this sub-project and all its phases?')) {
+          project.subprojects = project.subprojects.filter(s => s.id !== sub.id);
+          touchProject(project);
+          save(STORE_KEYS.projects, state.projects);
+          projNav.level = 'project'; projNav.subprojectId = null;
+          renderProjectsSection();
+        }
+      });
+      document.getElementById('addBtn-phase').addEventListener('click', () => openPhaseForm(null));
+      renderSubprojectDetail(content, project, sub);
+    }
+  }
+
+  function renderProjectsList(content) {
+    const items = state.projects.filter(p =>
+      !projSearchQuery || [p.name, p.type, p.status, p.notes].some(f => (f || '').toLowerCase().includes(projSearchQuery))
+    );
+    if (!items.length) {
+      content.innerHTML = '<div class="empty-state">No projects yet. Click "+ Add Project" to get started.</div>';
+      return;
+    }
+    content.innerHTML = `<div class="card-grid">${items.map(p => {
+      const { done, total } = projectProgress(p);
+      return `
+        <div class="card" data-open-project="${p.id}" style="cursor:pointer;">
+          <div class="card-top">
+            <h3 class="card-title">${escapeHtml(p.name)}</h3>
+          </div>
+          <div class="card-meta">
+            <span class="badge">${escapeHtml(p.type)}</span>
+            <span class="badge">${escapeHtml(p.status)}</span>
+            ${p.deadline ? `<span class="badge">⏰ ${escapeHtml(fmtDate(p.deadline))}</span>` : ''}
+          </div>
+          ${progressBarHtml(done, total)}
+        </div>
+      `;
+    }).join('')}</div>`;
+    content.querySelectorAll('[data-open-project]').forEach(card => card.addEventListener('click', () => {
+      projNav = { level: 'project', projectId: card.dataset.openProject, subprojectId: null };
+      renderProjectsSection();
+    }));
+  }
+
+  function renderProjectDetail(content, project) {
+    const tools = (project.tools || []);
+    const mdFiles = (project.mdFiles || '').split('\n').map(s => s.trim()).filter(Boolean);
+    let html = `
+      <div class="detail-panel">
+        <div class="card-meta">
+          <span class="badge">${escapeHtml(project.type)}</span>
+          <span class="badge">${escapeHtml(project.status)}</span>
+          ${project.deadline ? `<span class="badge">⏰ ${escapeHtml(fmtDate(project.deadline))}</span>` : ''}
+        </div>
+        ${tools.length ? `<div class="tag-list">${tools.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+        ${mdFiles.length ? `<details class="field-block" open><summary>Linked .md files</summary>${mdFiles.map(f => `<div class="card-body dim">📄 ${escapeHtml(f)}</div>`).join('')}</details>` : ''}
+        ${project.notes ? `<details class="field-block" open><summary>Notes / workflow</summary><div class="card-body">${escapeHtml(project.notes)}</div></details>` : ''}
+        <div class="progress-label" style="margin-top:10px;">Last modified: ${project.lastModified ? new Date(project.lastModified).toLocaleString() : '—'}</div>
+      </div>
+    `;
+    if (!project.subprojects.length) {
+      html += '<div class="empty-state">No sub-projects yet. Click "+ Add Sub-project" to get started.</div>';
+    } else {
+      html += `<div class="card-grid">${project.subprojects.map(s => {
+        const { done, total } = subprojectProgress(s);
+        return `
+          <div class="card" data-open-sub="${s.id}" style="cursor:pointer;">
+            <div class="card-top">
+              <h3 class="card-title">${escapeHtml(s.name)}</h3>
+            </div>
+            ${progressBarHtml(done, total)}
+          </div>
+        `;
+      }).join('')}</div>`;
+    }
+    content.innerHTML = html;
+    content.querySelectorAll('[data-open-sub]').forEach(card => card.addEventListener('click', () => {
+      projNav.level = 'subproject';
+      projNav.subprojectId = card.dataset.openSub;
+      renderProjectsSection();
+    }));
+  }
+
+  function renderSubprojectDetail(content, project, sub) {
+    let html = '';
+    if (sub.notes) {
+      html += `<div class="detail-panel"><div class="card-body">${escapeHtml(sub.notes)}</div></div>`;
+    }
+    if (!sub.phases.length) {
+      html += '<div class="empty-state">No phases yet. Click "+ Add Phase" to get started.</div>';
+    } else {
+      html += sub.phases.map(ph => `
+        <div class="phase-row">
+          <div class="phase-left">
+            <span class="phase-status-icon">${PHASE_ICON[ph.status]}</span>
+            <div>
+              <div class="phase-name">${escapeHtml(ph.name)}</div>
+              <div class="phase-deadline">${PHASE_LABEL[ph.status]}${ph.deadline ? ' · ⏰ ' + escapeHtml(fmtDate(ph.deadline)) : ''}</div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button data-edit-phase="${ph.id}">Edit</button>
+            <button data-delete-phase="${ph.id}">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    content.innerHTML = html;
+    content.querySelectorAll('[data-edit-phase]').forEach(b => b.addEventListener('click', () => {
+      openPhaseForm(sub.phases.find(ph => ph.id === b.dataset.editPhase));
+    }));
+    content.querySelectorAll('[data-delete-phase]').forEach(b => b.addEventListener('click', () => {
+      if (confirm('Delete this phase?')) {
+        sub.phases = sub.phases.filter(ph => ph.id !== b.dataset.deletePhase);
+        touchProject(project);
+        save(STORE_KEYS.projects, state.projects);
+        renderProjectsSection();
+      }
+    }));
+  }
+
+  function closeForm2(section) {
+    const el = document.getElementById('form-' + section);
+    if (el) el.classList.remove('open');
+  }
+
+  function openProjectForm(project) {
+    document.getElementById('form-project').classList.add('open');
+    editingProject = project ? project.id : null;
+    document.getElementById('project-name').value = project?.name || '';
+    document.getElementById('project-type').value = project?.type || 'YT Kanal';
+    document.getElementById('project-status').value = project?.status || 'Aktivan';
+    document.getElementById('project-deadline').value = project?.deadline || '';
+    document.getElementById('project-tools').value = (project?.tools || []).join(', ');
+    document.getElementById('project-mdfiles').value = project?.mdFiles || '';
+    document.getElementById('project-notes').value = project?.notes || '';
+  }
+  document.getElementById('cancelBtn-project').addEventListener('click', () => closeForm2('project'));
+  document.getElementById('saveBtn-project').addEventListener('click', () => {
+    const name = document.getElementById('project-name').value.trim();
+    if (!name) { alert('Project name is required.'); return; }
+    const data = {
+      name,
+      type: document.getElementById('project-type').value,
+      status: document.getElementById('project-status').value,
+      deadline: document.getElementById('project-deadline').value,
+      tools: document.getElementById('project-tools').value.split(',').map(s => s.trim()).filter(Boolean),
+      mdFiles: document.getElementById('project-mdfiles').value.trim(),
+      notes: document.getElementById('project-notes').value.trim()
+    };
+    if (editingProject) {
+      const idx = state.projects.findIndex(p => p.id === editingProject);
+      if (idx !== -1) { state.projects[idx] = { ...state.projects[idx], ...data, lastModified: Date.now() }; }
+    } else {
+      state.projects.unshift({ id: uid(), ...data, lastModified: Date.now(), subprojects: [] });
+    }
+    save(STORE_KEYS.projects, state.projects);
+    closeForm2('project');
+    renderProjectsSection();
+  });
+
+  function openSubprojectForm(sub) {
+    document.getElementById('form-subproject').classList.add('open');
+    editingSubproject = sub ? sub.id : null;
+    document.getElementById('subproject-name').value = sub?.name || '';
+    document.getElementById('subproject-notes').value = sub?.notes || '';
+  }
+  document.getElementById('cancelBtn-subproject').addEventListener('click', () => closeForm2('subproject'));
+  document.getElementById('saveBtn-subproject').addEventListener('click', () => {
+    const name = document.getElementById('subproject-name').value.trim();
+    if (!name) { alert('Sub-project name is required.'); return; }
+    const project = findProject(projNav.projectId);
+    const data = {
+      name,
+      notes: document.getElementById('subproject-notes').value.trim()
+    };
+    if (editingSubproject) {
+      const idx = project.subprojects.findIndex(s => s.id === editingSubproject);
+      if (idx !== -1) project.subprojects[idx] = { ...project.subprojects[idx], ...data, lastModified: Date.now() };
+    } else {
+      project.subprojects.unshift({ id: uid(), ...data, lastModified: Date.now(), phases: [] });
+    }
+    touchProject(project);
+    save(STORE_KEYS.projects, state.projects);
+    closeForm2('subproject');
+    renderProjectsSection();
+  });
+
+  function openPhaseForm(phase) {
+    document.getElementById('form-phase').classList.add('open');
+    editingPhase = phase ? phase.id : null;
+    document.getElementById('phase-name').value = phase?.name || '';
+    document.getElementById('phase-status').value = phase?.status || 'todo';
+    document.getElementById('phase-deadline').value = phase?.deadline || '';
+  }
+  document.getElementById('cancelBtn-phase').addEventListener('click', () => closeForm2('phase'));
+  document.getElementById('saveBtn-phase').addEventListener('click', () => {
+    const name = document.getElementById('phase-name').value.trim();
+    if (!name) { alert('Phase name is required.'); return; }
+    const project = findProject(projNav.projectId);
+    const sub = findSubproject(project, projNav.subprojectId);
+    const data = {
+      name,
+      status: document.getElementById('phase-status').value,
+      deadline: document.getElementById('phase-deadline').value
+    };
+    if (editingPhase) {
+      const idx = sub.phases.findIndex(ph => ph.id === editingPhase);
+      if (idx !== -1) sub.phases[idx] = { ...sub.phases[idx], ...data };
+    } else {
+      sub.phases.push({ id: uid(), ...data });
+    }
+    touchProject(project);
+    save(STORE_KEYS.projects, state.projects);
+    closeForm2('phase');
+    renderProjectsSection();
+  });
+
   // ---------- INITIAL RENDER ----------
   renderTools();
   renderPrompts();
   renderContent();
   renderInbox();
+  renderProjectsSection();
 })();
 </script>
 </body>
