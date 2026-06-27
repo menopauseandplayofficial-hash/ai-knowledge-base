@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Knowledge Base</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f5f6f8;
+    --bg-card: #fafbfc;
+    --border: #e3e6ea;
+    --text: #1f2328;
+    --text-soft: #5b6470;
+    --accent: #5b8def;
+    --accent-soft: #eaf1ff;
+    --danger: #e5605a;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] {
+    --bg: #15171a;
+    --bg-soft: #1d2024;
+    --bg-card: #1a1d21;
+    --border: #2c2f34;
+    --text: #e8eaed;
+    --text-soft: #9aa1ab;
+    --accent: #6f9bf0;
+    --accent-soft: #20304a;
+    --danger: #f08881;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background .2s, color .2s;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 600;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    transition: background .15s, border-color .15s;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  button.primary:hover { opacity: .9; }
+  button.icon-btn {
+    padding: 8px 10px;
+  }
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 20px 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  nav.tabs button {
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 10px 16px;
+    font-size: 15px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  nav.tabs button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .toolbar input[type="text"].search {
+    flex: 1;
+    min-width: 160px;
+  }
+  input, select, textarea {
+    font-family: inherit;
+    font-size: 15px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  textarea { resize: vertical; font-size: 15px; line-height: 1.5; }
+  textarea.large { min-height: 140px; }
+  .form-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .form-panel.open { display: block; }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .form-grid.single { grid-template-columns: 1fr; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+  .form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .card-meta {
+    font-size: 12px;
+    color: var(--text-soft);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .card-body {
+    font-size: 15px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    color: var(--text);
+  }
+  .card-body.dim { color: var(--text-soft); }
+  .card-link a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  .card-link a:hover { text-decoration: underline; }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .card-actions button { padding: 6px 10px; font-size: 13px; }
+  .empty-state {
+    text-align: center;
+    color: var(--text-soft);
+    padding: 50px 20px;
+    font-size: 15px;
+  }
+  details.field-block { margin-top: 6px; }
+  details.field-block summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .quick-capture-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+  .quick-capture-bar .row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .quick-capture-bar input { flex: 1; min-width: 120px; }
+  .pill-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .pill-toggle button {
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+  .pill-toggle button.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 16px; }
+    .card-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧠 AI Knowledge Base</h1>
+  <div class="header-actions">
+    <button id="exportBtn" class="icon-btn" title="Export all data as JSON">⬇ Export JSON</button>
+    <button id="themeBtn" class="icon-btn" title="Toggle dark/light mode">🌙</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="tools" class="active">AI Tools</button>
+  <button data-tab="prompts">Prompts</button>
+  <button data-tab="content">Content Tracker</button>
+  <button data-tab="inbox">Quick Capture</button>
+</nav>
+
+<main>
+
+  <!-- TOOLS SECTION -->
+  <section class="section active" id="section-tools">
+    <div class="toolbar">
+      <input type="text" class="search" id="search-tools" placeholder="Search tools…">
+      <button class="primary" id="addBtn-tools">+ Add Tool</button>
+    </div>
+    <div class="form-panel" id="form-tools">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Tool Name</label>
+          <input type="text" id="tools-name">
+        </div>
+        <div class="field full">
+          <label>What it does</label>
+          <textarea id="tools-desc" rows="3"></textarea>
+        </div>
+        <div class="field full">
+          <label>Link</label>
+          <input type="text" id="tools-link" placeholder="https://…">
+        </div>
+        <div class="field full">
+          <label>Notes</label>
+          <textarea id="tools-notes" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-tools">Cancel</button>
+        <button class="primary" id="saveBtn-tools">Save</button>
+      </div>
+    </div>
+    <div id="list-tools"></div>
+  </section>
+
+  <!-- PROMPTS SECTION -->
+  <section class="section" id="section-prompts">
+    <div class="toolbar">
+      <input type="text" class="search" id="search-prompts" placeholder="Search prompts…">
+      <button class="primary" id="addBtn-prompts">+ Add Prompt</button>
+    </div>
+    <div class="form-panel" id="form-prompts">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Category</label>
+          <input type="text" id="prompts-category" placeholder="e.g. Writing, Coding, Marketing">
+        </div>
+        <div class="field full">
+          <label>Prompt text</label>
+          <textarea id="prompts-text" class="large" rows="5"></textarea>
+        </div>
+        <div class="field full">
+          <label>Use case</label>
+          <input type="text" id="prompts-usecase">
+        </div>
+        <div class="field full">
+          <label>Result / notes</label>
+          <textarea id="prompts-result" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-prompts">Cancel</button>
+        <button class="primary" id="saveBtn-prompts">Save</button>
+      </div>
+    </div>
+    <div id="list-prompts"></div>
+  </section>
+
+  <!-- CONTENT TRACKER SECTION -->
+  <section class="section" id="section-content">
+    <div class="toolbar">
+      <input type="text" class="search" id="search-content" placeholder="Search content…">
+      <button class="primary" id="addBtn-content">+ Add Item</button>
+    </div>
+    <div class="form-panel" id="form-content">
+      <div class="form-grid">
+        <div class="field full">
+          <label>Title</label>
+          <input type="text" id="content-title">
+        </div>
+        <div class="field">
+          <label>Topic</label>
+          <select id="content-topic">
+            <option value="YT channels">YT channels</option>
+            <option value="Digital products">Digital products</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="content-status">
+            <option value="to watch">to watch</option>
+            <option value="watched">watched</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>What I learned</label>
+          <textarea id="content-learned" rows="4"></textarea>
+        </div>
+        <div class="field full">
+          <label>Workflow steps</label>
+          <textarea id="content-workflow" class="large" rows="6"></textarea>
+        </div>
+        <div class="field full">
+          <label>Master plan (markdown-style notes)</label>
+          <textarea id="content-masterplan" class="large" rows="8"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="cancelBtn-content">Cancel</button>
+        <button class="primary" id="saveBtn-content">Save</button>
+      </div>
+    </div>
+    <div id="list-content"></div>
+  </section>
+
+  <!-- QUICK CAPTURE SECTION -->
+  <section class="section" id="section-inbox">
+    <div class="quick-capture-bar">
+      <div class="row">
+        <input type="text" id="inbox-title" placeholder="Idea / link title… (required)">
+        <input type="text" id="inbox-link" placeholder="Link (optional)">
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <input type="text" id="inbox-note" placeholder="Short note (optional)">
+        <input type="text" id="inbox-tag" placeholder="Tag (optional)">
+        <button class="primary" id="inbox-quickadd">+ Capture</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search" id="search-inbox" placeholder="Search captures…">
+      <div class="pill-toggle">
+        <button data-filter="all" class="active">All</button>
+        <button data-filter="to review">To review</button>
+        <button data-filter="reviewed">Reviewed</button>
+      </div>
+    </div>
+    <div id="list-inbox"></div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  const STORE_KEYS = {
+    tools: 'akb_tools',
+    prompts: 'akb_prompts',
+    content: 'akb_content',
+    inbox: 'akb_inbox',
+    theme: 'akb_theme'
+  };
+
+  function load(key) {
+    try { return JSON.parse(localStorage.getItem(key)) || []; }
+    catch (e) { return []; }
+  }
+  function save(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function linkify(url) {
+    if (!url) return '';
+    const safe = escapeHtml(url);
+    return `<div class="card-link"><a href="${safe}" target="_blank" rel="noopener noreferrer">${safe}</a></div>`;
+  }
+
+  let state = {
+    tools: load(STORE_KEYS.tools),
+    prompts: load(STORE_KEYS.prompts),
+    content: load(STORE_KEYS.content),
+    inbox: load(STORE_KEYS.inbox)
+  };
+
+  let editing = { tools: null, prompts: null, content: null };
+
+  // ---------- THEME ----------
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeBtn.textContent = '☀️';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      themeBtn.textContent = '🌙';
+    }
+  }
+  let currentTheme = localStorage.getItem(STORE_KEYS.theme) || 'light';
+  applyTheme(currentTheme);
+  themeBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(STORE_KEYS.theme, currentTheme);
+    applyTheme(currentTheme);
+  });
+
+  // ---------- TABS ----------
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-' + tab).classList.add('active');
+    });
+  });
+
+  // ---------- EXPORT ----------
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const all = {
+      tools: state.tools,
+      prompts: state.prompts,
+      content: state.content,
+      inbox: state.inbox,
+      exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ai-knowledge-base-export-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // ================= GENERIC FORM HELPERS =================
+  function openForm(section, item) {
+    document.getElementById('form-' + section).classList.add('open');
+    editing[section] = item ? item.id : null;
+    if (section === 'tools') {
+      document.getElementById('tools-name').value = item?.name || '';
+      document.getElementById('tools-desc').value = item?.desc || '';
+      document.getElementById('tools-link').value = item?.link || '';
+      document.getElementById('tools-notes').value = item?.notes || '';
+    } else if (section === 'prompts') {
+      document.getElementById('prompts-category').value = item?.category || '';
+      document.getElementById('prompts-text').value = item?.text || '';
+      document.getElementById('prompts-usecase').value = item?.usecase || '';
+      document.getElementById('prompts-result').value = item?.result || '';
+    } else if (section === 'content') {
+      document.getElementById('content-title').value = item?.title || '';
+      document.getElementById('content-topic').value = item?.topic || 'YT channels';
+      document.getElementById('content-status').value = item?.status || 'to watch';
+      document.getElementById('content-learned').value = item?.learned || '';
+      document.getElementById('content-workflow').value = item?.workflow || '';
+      document.getElementById('content-masterplan').value = item?.masterplan || '';
+    }
+  }
+  function closeForm(section) {
+    document.getElementById('form-' + section).classList.remove('open');
+    editing[section] = null;
+  }
+
+  // ================= TOOLS =================
+  document.getElementById('addBtn-tools').addEventListener('click', () => openForm('tools', null));
+  document.getElementById('cancelBtn-tools').addEventListener('click', () => closeForm('tools'));
+  document.getElementById('saveBtn-tools').addEventListener('click', () => {
+    const name = document.getElementById('tools-name').value.trim();
+    if (!name) { alert('Tool name is required.'); return; }
+    const data = {
+      name,
+      desc: document.getElementById('tools-desc').value.trim(),
+      link: document.getElementById('tools-link').value.trim(),
+      notes: document.getElementById('tools-notes').value.trim()
+    };
+    if (editing.tools) {
+      const idx = state.tools.findIndex(t => t.id === editing.tools);
+      if (idx !== -1) state.tools[idx] = { ...state.tools[idx], ...data };
+    } else {
+      state.tools.unshift({ id: uid(), createdAt: Date.now(), ...data });
+    }
+    save(STORE_KEYS.tools, state.tools);
+    closeForm('tools');
+    renderTools();
+  });
+  function renderTools() {
+    const q = document.getElementById('search-tools').value.toLowerCase();
+    const list = document.getElementById('list-tools');
+    const items = state.tools.filter(t =>
+      !q || [t.name, t.desc, t.notes].some(f => (f||'').toLowerCase().includes(q))
+    );
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state">No tools yet. Click "+ Add Tool" to get started.</div>';
+      return;
+    }
+    list.innerHTML = items.map(t => `
+      <div class="card">
+        <div class="card-top">
+          <h3 class="card-title">${escapeHtml(t.name)}</h3>
+          <div class="card-actions">
+            <button data-edit="${t.id}">Edit</button>
+            <button data-delete="${t.id}">Delete</button>
+          </div>
+        </div>
+        ${t.desc ? `<div class="card-body">${escapeHtml(t.desc)}</div>` : ''}
+        ${linkify(t.link)}
+        ${t.notes ? `<details class="field-block"><summary>Notes</summary><div class="card-body dim">${escapeHtml(t.notes)}</div></details>` : ''}
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+      openForm('tools', state.tools.find(t => t.id === b.dataset.edit));
+    }));
+    list.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
+      if (confirm('Delete this tool?')) {
+        state.tools = state.tools.filter(t => t.id !== b.dataset.delete);
+        save(STORE_KEYS.tools, state.tools);
+        renderTools();
+      }
+    }));
+  }
+  document.getElementById('search-tools').addEventListener('input', renderTools);
+
+  // ================= PROMPTS =================
+  document.getElementById('addBtn-prompts').addEventListener('click', () => openForm('prompts', null));
+  document.getElementById('cancelBtn-prompts').addEventListener('click', () => closeForm('prompts'));
+  document.getElementById('saveBtn-prompts').addEventListener('click', () => {
+    const text = document.getElementById('prompts-text').value.trim();
+    if (!text) { alert('Prompt text is required.'); return; }
+    const data = {
+      category: document.getElementById('prompts-category').value.trim(),
+      text,
+      usecase: document.getElementById('prompts-usecase').value.trim(),
+      result: document.getElementById('prompts-result').value.trim()
+    };
+    if (editing.prompts) {
+      const idx = state.prompts.findIndex(p => p.id === editing.prompts);
+      if (idx !== -1) state.prompts[idx] = { ...state.prompts[idx], ...data };
+    } else {
+      state.prompts.unshift({ id: uid(), createdAt: Date.now(), ...data });
+    }
+    save(STORE_KEYS.prompts, state.prompts);
+    closeForm('prompts');
+    renderPrompts();
+  });
+  function renderPrompts() {
+    const q = document.getElementById('search-prompts').value.toLowerCase();
+    const list = document.getElementById('list-prompts');
+    const items = state.prompts.filter(p =>
+      !q || [p.category, p.text, p.usecase, p.result].some(f => (f||'').toLowerCase().includes(q))
+    );
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state">No prompts yet. Click "+ Add Prompt" to get started.</div>';
+      return;
+    }
+    list.innerHTML = items.map(p => `
+      <div class="card">
+        <div class="card-top">
+          <h3 class="card-title">${p.category ? `<span class="badge">${escapeHtml(p.category)}</span>` : 'Prompt'}</h3>
+          <div class="card-actions">
+            <button data-copy="${p.id}">Copy</button>
+            <button data-edit="${p.id}">Edit</button>
+            <button data-delete="${p.id}">Delete</button>
+          </div>
+        </div>
+        <div class="card-body">${escapeHtml(p.text)}</div>
+        ${p.usecase ? `<div class="card-meta"><strong>Use case:</strong> ${escapeHtml(p.usecase)}</div>` : ''}
+        ${p.result ? `<details class="field-block"><summary>Result / notes</summary><div class="card-body dim">${escapeHtml(p.result)}</div></details>` : ''}
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+      openForm('prompts', state.prompts.find(p => p.id === b.dataset.edit));
+    }));
+    list.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
+      if (confirm('Delete this prompt?')) {
+        state.prompts = state.prompts.filter(p => p.id !== b.dataset.delete);
+        save(STORE_KEYS.prompts, state.prompts);
+        renderPrompts();
+      }
+    }));
+    list.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+      const item = state.prompts.find(p => p.id === b.dataset.copy);
+      if (!item) return;
+      navigator.clipboard.writeText(item.text).then(() => {
+        const original = b.textContent;
+        b.textContent = 'Copied!';
+        setTimeout(() => b.textContent = original, 1200);
+      }).catch(() => alert('Could not copy automatically. Select the text manually.'));
+    }));
+  }
+  document.getElementById('search-prompts').addEventListener('input', renderPrompts);
+
+  // ================= CONTENT TRACKER =================
+  document.getElementById('addBtn-content').addEventListener('click', () => openForm('content', null));
+  document.getElementById('cancelBtn-content').addEventListener('click', () => closeForm('content'));
+  document.getElementById('saveBtn-content').addEventListener('click', () => {
+    const title = document.getElementById('content-title').value.trim();
+    if (!title) { alert('Title is required.'); return; }
+    const data = {
+      title,
+      topic: document.getElementById('content-topic').value,
+      status: document.getElementById('content-status').value,
+      learned: document.getElementById('content-learned').value.trim(),
+      workflow: document.getElementById('content-workflow').value.trim(),
+      masterplan: document.getElementById('content-masterplan').value.trim()
+    };
+    if (editing.content) {
+      const idx = state.content.findIndex(c => c.id === editing.content);
+      if (idx !== -1) state.content[idx] = { ...state.content[idx], ...data };
+    } else {
+      state.content.unshift({ id: uid(), createdAt: Date.now(), ...data });
+    }
+    save(STORE_KEYS.content, state.content);
+    closeForm('content');
+    renderContent();
+  });
+  function renderContent() {
+    const q = document.getElementById('search-content').value.toLowerCase();
+    const list = document.getElementById('list-content');
+    const items = state.content.filter(c =>
+      !q || [c.title, c.topic, c.learned, c.workflow, c.masterplan, c.status].some(f => (f||'').toLowerCase().includes(q))
+    );
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state">No content tracked yet. Click "+ Add Item" to get started.</div>';
+      return;
+    }
+    list.innerHTML = items.map(c => `
+      <div class="card">
+        <div class="card-top">
+          <h3 class="card-title">${escapeHtml(c.title)}</h3>
+          <div class="card-actions">
+            <button data-edit="${c.id}">Edit</button>
+            <button data-delete="${c.id}">Delete</button>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="badge">${escapeHtml(c.topic)}</span>
+          <span class="badge">${escapeHtml(c.status)}</span>
+        </div>
+        ${c.learned ? `<div class="card-body">${escapeHtml(c.learned)}</div>` : ''}
+        ${c.workflow ? `<details class="field-block"><summary>Workflow steps</summary><div class="card-body dim">${escapeHtml(c.workflow)}</div></details>` : ''}
+        ${c.masterplan ? `<details class="field-block"><summary>Master plan</summary><div class="card-body dim">${escapeHtml(c.masterplan)}</div></details>` : ''}
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+      openForm('content', state.content.find(c => c.id === b.dataset.edit));
+    }));
+    list.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
+      if (confirm('Delete this item?')) {
+        state.content = state.content.filter(c => c.id !== b.dataset.delete);
+        save(STORE_KEYS.content, state.content);
+        renderContent();
+      }
+    }));
+  }
+  document.getElementById('search-content').addEventListener('input', renderContent);
+
+  // ================= QUICK CAPTURE / INBOX =================
+  let inboxFilter = 'all';
+  function quickAdd() {
+    const title = document.getElementById('inbox-title').value.trim();
+    if (!title) { document.getElementById('inbox-title').focus(); return; }
+    const item = {
+      id: uid(),
+      createdAt: Date.now(),
+      title,
+      link: document.getElementById('inbox-link').value.trim(),
+      note: document.getElementById('inbox-note').value.trim(),
+      tag: document.getElementById('inbox-tag').value.trim(),
+      status: 'to review'
+    };
+    state.inbox.unshift(item);
+    save(STORE_KEYS.inbox, state.inbox);
+    document.getElementById('inbox-title').value = '';
+    document.getElementById('inbox-link').value = '';
+    document.getElementById('inbox-note').value = '';
+    document.getElementById('inbox-tag').value = '';
+    document.getElementById('inbox-title').focus();
+    renderInbox();
+  }
+  document.getElementById('inbox-quickadd').addEventListener('click', quickAdd);
+  ['inbox-title', 'inbox-link', 'inbox-note', 'inbox-tag'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); quickAdd(); }
+    });
+  });
+  document.querySelectorAll('.pill-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pill-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      inboxFilter = btn.dataset.filter;
+      renderInbox();
+    });
+  });
+  function renderInbox() {
+    const q = document.getElementById('search-inbox').value.toLowerCase();
+    const list = document.getElementById('list-inbox');
+    let items = state.inbox.filter(i =>
+      !q || [i.title, i.note, i.tag].some(f => (f||'').toLowerCase().includes(q))
+    );
+    if (inboxFilter !== 'all') items = items.filter(i => i.status === inboxFilter);
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state">Nothing captured yet. Use the box above to save an idea fast.</div>';
+      return;
+    }
+    list.innerHTML = items.map(i => `
+      <div class="card">
+        <div class="card-top">
+          <h3 class="card-title">${escapeHtml(i.title)}</h3>
+          <div class="card-actions">
+            ${i.status === 'to review' ? `<button data-review="${i.id}">Mark reviewed</button>` : `<button data-unreview="${i.id}">Mark to review</button>`}
+            <button data-delete="${i.id}">Delete</button>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="badge">${escapeHtml(i.status)}</span>
+          ${i.tag ? `<span class="badge">${escapeHtml(i.tag)}</span>` : ''}
+        </div>
+        ${i.note ? `<div class="card-body">${escapeHtml(i.note)}</div>` : ''}
+        ${linkify(i.link)}
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-review]').forEach(b => b.addEventListener('click', () => {
+      const item = state.inbox.find(i => i.id === b.dataset.review);
+      if (item) { item.status = 'reviewed'; save(STORE_KEYS.inbox, state.inbox); renderInbox(); }
+    }));
+    list.querySelectorAll('[data-unreview]').forEach(b => b.addEventListener('click', () => {
+      const item = state.inbox.find(i => i.id === b.dataset.unreview);
+      if (item) { item.status = 'to review'; save(STORE_KEYS.inbox, state.inbox); renderInbox(); }
+    }));
+    list.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', () => {
+      if (confirm('Delete this capture?')) {
+        state.inbox = state.inbox.filter(i => i.id !== b.dataset.delete);
+        save(STORE_KEYS.inbox, state.inbox);
+        renderInbox();
+      }
+    }));
+  }
+  document.getElementById('search-inbox').addEventListener('input', renderInbox);
+
+  // ---------- INITIAL RENDER ----------
+  renderTools();
+  renderPrompts();
+  renderContent();
+  renderInbox();
+})();
+</script>
+</body>
+</html>
